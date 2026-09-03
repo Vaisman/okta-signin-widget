@@ -17,6 +17,7 @@ import {
   ActionPendingElement,
   ChromeDtcContainerElement,
   DescriptionElement,
+  DeviceTrustChallengeElement,
   IdxStepTransformer,
   IStepperContext,
   IWidgetContext,
@@ -100,7 +101,9 @@ export const transformOktaVerifyDeviceChallengePoll: IdxStepTransformer = ({
     ? transaction.nextStep?.relatesTo?.value
     // @ts-expect-error challenge is not defined on contextualData
     : transaction.nextStep?.relatesTo?.value?.contextualData?.challenge?.value;
-  const { challengeMethod, href, downloadHref } = deviceChallengePayload;
+  const {
+    challengeMethod, challengeRequest, href, downloadHref,
+  } = deviceChallengePayload;
 
   const titleElement = getTitleElement(challengeMethod);
 
@@ -129,6 +132,15 @@ export const transformOktaVerifyDeviceChallengePoll: IdxStepTransformer = ({
     type: 'ChromeDtcContainer',
     options: {
       href,
+    },
+  };
+
+  const deviceTrustChallenge: DeviceTrustChallengeElement = {
+    type: 'DeviceTrustChallenge',
+    options: {
+      challengeRequest,
+      content: loc('deviceTrust.sso.redirectText', 'login'),
+      step: nextStep.name,
     },
   };
 
@@ -165,7 +177,11 @@ export const transformOktaVerifyDeviceChallengePoll: IdxStepTransformer = ({
     },
   };
 
-  uischema.elements.unshift(titleElement);
+  uischema.elements.unshift(
+    challengeMethod === CHALLENGE_METHOD.CHROME_DTC_JS
+      ? deviceTrustChallenge
+      : titleElement,
+  );
 
   // if the current step is device-challenge-poll and the challenge method is APP_LINK,
   // we delay displaying the content because of a cold start issue with Okta Verify

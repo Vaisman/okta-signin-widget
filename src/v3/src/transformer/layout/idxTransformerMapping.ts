@@ -312,6 +312,13 @@ const TransformerMap: {
         showDefaultCancel: false,
       },
     },
+    [CHALLENGE_METHOD.CHROME_DTC_JS]: {
+      transform: transformOktaVerifyDeviceChallengePoll,
+      buttonConfig: {
+        showDefaultSubmit: false,
+        showDefaultCancel: false,
+      },
+    },
     [CHALLENGE_METHOD.CUSTOM_URI]: {
       transform: transformOktaVerifyDeviceChallengePoll,
       buttonConfig: {

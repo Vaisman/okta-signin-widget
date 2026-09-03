@@ -13,6 +13,7 @@ describe('v2/utils/ChallengeViewUtil', function() {
     doLoopback() {}
     doCustomURI() {}
     doChromeDTC() {}
+    doChromeDTCJS() {}
     removeChildren() {}
     $() {}
     options = {
@@ -297,6 +298,25 @@ describe('v2/utils/ChallengeViewUtil', function() {
             <div class="spinner"></div>
           `.call());
     expect(testView.doChromeDTC).toHaveBeenCalledWith(deviceChallenge);
+  });
+
+  it('CHROME_DTC_JS test case', function() {
+    const deviceChallenge = {
+      'challengeMethod': Enums.CHROME_DTC_JS,
+      'challengeRequest': 'test_challenge_request',
+    };
+    spyOn(testView, 'getDeviceChallengePayload').and.callFake(() => deviceChallenge);
+    let expectedAddArg = {};
+    spyOn(testView, 'add').and.callFake((arg) => {expectedAddArg = arg;});
+    spyOn(testView, 'doChromeDTCJS');
+    spyOn(View, 'extend').and.callFake((extendArg) => extendArg);
+
+    doChallenge(testView);
+
+    expect(testView.getDeviceChallengePayload).toHaveBeenCalled();
+    expect(testView.title).toBe(loc('deviceTrust.sso.redirectText', 'login'));
+    expect(expectedAddArg.className).toBe('chrome-dtc-js-content');
+    expect(testView.doChromeDTCJS).toHaveBeenCalledWith(deviceChallenge);
   });
 
   describe('getBiometricsErrorOptions', function() {

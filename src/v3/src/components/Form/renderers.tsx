@@ -28,6 +28,7 @@ import Button from '../Button';
 import CaptchaContainer from '../CaptchaContainer';
 import Checkbox from '../Checkbox';
 import ChromeDtcContainer from '../ChromeDtcContainer';
+import DeviceTrustChallenge from '../DeviceTrustChallenge';
 import Divider from '../Divider';
 import DuoWindow from '../DuoWindow';
 import Heading from '../Heading';
@@ -145,6 +146,10 @@ export default [
   {
     tester: ({ type }) => type === 'ChromeDtcContainer',
     renderer: ChromeDtcContainer,
+  },
+  {
+    tester: ({ type }) => type === 'DeviceTrustChallenge',
+    renderer: DeviceTrustChallenge,
   },
   {
     tester: ({ type }) => type === 'LaunchPasskeysAuthenticatorButton',

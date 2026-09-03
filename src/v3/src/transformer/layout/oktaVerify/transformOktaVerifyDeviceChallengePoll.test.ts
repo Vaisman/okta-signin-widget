@@ -16,6 +16,7 @@ import {
   ActionPendingElement,
   ChromeDtcContainerElement,
   DescriptionElement,
+  DeviceTrustChallengeElement,
   LinkElement,
   OpenOktaVerifyFPButtonElement,
   SpinnerElement,
@@ -173,6 +174,33 @@ describe('Transform Okta Verify Device Challenge Poll Tests', () => {
         .toBe('Link');
       expect((updatedFormBag.uischema.elements[2] as LinkElement).options.step)
         .toBe('cancel');
+    });
+
+    it('should transform elements when challengeMethod is CHROME_DTC_JS', () => {
+      transaction.nextStep = {
+        name: 'device-challenge-poll',
+        relatesTo: {
+          value: {
+            // @ts-expect-error Property 'challengeMethod' does not exist on type 'IdxAuthenticator'.
+            challengeMethod: 'CHROME_DTC_JS',
+            challengeRequest: 'challenge_request',
+          },
+        },
+      };
+      transaction.availableSteps = undefined;
+
+      const updatedFormBag = transformOktaVerifyDeviceChallengePoll({
+        transaction,
+        formBag,
+        widgetProps,
+      });
+
+      expect(updatedFormBag.uischema.elements.length).toBe(2);
+      const element = updatedFormBag.uischema.elements[0] as DeviceTrustChallengeElement;
+      expect(element.type).toBe('DeviceTrustChallenge');
+      expect(element.options.challengeRequest).toBe('challenge_request');
+      expect(element.options.content).toBe('deviceTrust.sso.redirectText');
+      expect(element.options.step).toBe('device-challenge-poll');
     });
   });
 

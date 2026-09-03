@@ -1,6 +1,7 @@
 /* eslint max-statements: [2, 22] */
-import { $ } from '@okta/courage';
+import { $, loc } from '@okta/courage';
 import BaseFormWithPolling from '../internals/BaseFormWithPolling';
+import DeviceTrust from 'util/DeviceTrust';
 import Logger from 'util/Logger';
 import {
   AUTHENTICATOR_CANCEL_ACTION,
@@ -227,6 +228,34 @@ const Body = BaseFormWithPolling.extend({
     this.ulDom && this.ulDom.remove();
     const IframeView = createInvisibleIFrame('chrome-dtc-container', deviceChallenge.href);
     this.ulDom = this.add(IframeView).last();
+  },
+
+  doChromeDTCJS(deviceChallenge) {
+    const challengeRequest = deviceChallenge.challengeRequest;
+
+    // The browser request may outlive this view, so ignore late completion
+    // after removal.
+    return DeviceTrust.getAttestation(challengeRequest)
+        .then((challengeResponse) => {
+          if (this.removed) {
+            return;
+          }
+          this.model.set('challengeResponse', challengeResponse);
+          this.stopPolling();
+          this.trigger('save', this.model);
+        })
+        .catch((error) => {
+          if (this.removed) {
+            return;
+          }
+          Logger.error(error);
+          const errorMessageKey = DeviceTrust.getErrorMessageKey(error);
+          this.model.trigger('error', this.model, {
+            responseJSON: {
+              errorSummary: loc(errorMessageKey, 'login'),
+            },
+          });
+        });
   },
 
   stopProbing() {

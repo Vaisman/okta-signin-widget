@@ -505,6 +505,15 @@ export interface ChromeDtcContainerElement extends UISchemaElement {
   };
 }
 
+export interface DeviceTrustChallengeElement extends UISchemaElement {
+  type: 'DeviceTrustChallenge';
+  options: {
+    challengeRequest: string;
+    content: string;
+    step: string;
+  };
+}
+
 export interface TitleElement extends UISchemaElement {
   type: 'Title';
   options: {
